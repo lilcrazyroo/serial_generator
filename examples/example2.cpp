@@ -18,12 +18,10 @@ int main() {
         Article{ "Article3" }
     } };
 
-    using StringStorage = memserial::StringStorage< memserial::BigEndian >;
-    std::string bytes = memserial::serialize< StringStorage >( article );
+    std::string bytes = memserial::serialize( article );
 
-    using StringWrapper = memserial::StringWrapper< memserial::BigEndian >;
-    memserial::print( memserial::parse< Header >( StringWrapper{ bytes } ), std::cout );
-
+    memserial::print( memserial::parse< Header >( bytes ), std::cout );
     std::cout << '\n';
-    memserial::trace( StringWrapper{ bytes }, std::cout );
+
+    memserial::trace( bytes, std::cout );
 }

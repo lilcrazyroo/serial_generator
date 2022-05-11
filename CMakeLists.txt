@@ -15,22 +15,25 @@ if( FALSE )
 endif()
 
 if( TRUE )
-    target_compile_definitions( serial_specs INTERFACE -DSERIAL_REBIND_HEADER="serial_generated.h" )
+    string( TOLOWER "serial_generated.${CMAKE_CXX_COMPILER_ID}.${CMAKE_SYSTEM_PROCESSOR}.h" GENERATED_HEADER )
+    target_compile_definitions( serial_specs INTERFACE -DSERIAL_REBIND_HEADER="${GENERATED_HEADER}" )
         
-    add_custom_command( OUTPUT ${CMAKE_CURRENT_LIST_DIR}/src/serial_generated.h 
-        COMMAND ${CMAKE_COMMAND} -D CMAKE_ROOT_DIR=${CMAKE_CURRENT_SOURCE_DIR}
-            -S ${CMAKE_CURRENT_SOURCE_DIR}/src -B ${CMAKE_CURRENT_BINARY_DIR}/serial_generator 
+    add_custom_command( OUTPUT ${CMAKE_CURRENT_LIST_DIR}/src/${GENERATED_HEADER} 
+        COMMAND ${CMAKE_COMMAND} -S${CMAKE_CURRENT_SOURCE_DIR}/src -B${CMAKE_CURRENT_BINARY_DIR}/serial_generator 
+            -DSERIAL_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+            -DSERIAL_FORWARD_HEADER="serial_precompile.cpp"
+            -DSERIAL_GENERATED_HEADER=${GENERATED_HEADER}
         COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/serial_generator
-        BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/src/serial_generated.h
+        BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/src/${GENERATED_HEADER}
         IMPLICIT_DEPENDS CXX ${CMAKE_CURRENT_LIST_DIR}/src/serial_precompile.cpp
         WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/src )
         
-    add_custom_target( serial_rebind DEPENDS ${CMAKE_CURRENT_LIST_DIR}/src/serial_generated.h )
-    add_dependencies( serial_specs serial_rebind )
+    add_custom_target( serial_generated DEPENDS ${CMAKE_CURRENT_LIST_DIR}/src/${GENERATED_HEADER} )
+    add_dependencies( serial_specs serial_generated )
 endif()
 
 if( TRUE )
-	add_library( memserial SHARED src/serial_precompile.cpp )
+    add_library( memserial SHARED src/serial_precompile.cpp )
     set_target_properties( memserial PROPERTIES LINKER_LANGUAGE CXX )
     target_link_libraries( memserial PUBLIC serial_specs )
     target_include_directories( memserial PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src )

@@ -11,12 +11,7 @@ int main() {
         Article{ "Article3" }
     } };
 
-    try {
-        std::string bytes = memserial::serialize( article );
-        Article value = memserial::parse< Article >( bytes );
-        memserial::print( value, std::cout );
-    }
-    catch ( memserial::SerialException& ex ) {
-        std::cout << ex.what();
-    }
+    std::string bytes = memserial::serialize( article );
+    Article value = memserial::parse< Article >( bytes );
+    memserial::print( value, std::cout );
 }
