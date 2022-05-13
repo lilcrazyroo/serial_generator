@@ -188,7 +188,7 @@ struct SerialData< Type, is_alias< Type > > {
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >();
+        return serial_alias< Type >();
     }
 
     template< typename HeadType >
@@ -210,12 +210,12 @@ struct SerialData< Type, is_head< Type > > {
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >();
+        return serial_alias< Type >();
     }
 
     template< typename HeadType >
     void generate( GeneratorData& generator, SerialData< HeadType >& head ) {
-        if ( !generator.recursion( SerialMetatype< Type >::hash().full() ) ) {
+        if ( !generator.recursion( serial_hash< Type >() ) ) {
             generator.generate( *this );
         }
     }
@@ -265,7 +265,7 @@ struct SerialData< Type, is_primitive< Type > > {
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< InternalType >::alias() }.convert< std::string >();
+        return serial_alias< InternalType >();
     }
 
     template< typename HeadType >
@@ -289,8 +289,7 @@ struct SerialData< basic_string< Args... >, is_true< basic_string< Args... > > >
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >() +
-                "< " + SerialData< DataType >::alias() + " >";
+        return serial_alias< Type >() + "< " + SerialData< DataType >::alias() + " >";
     }
 
     template< typename HeadType >
@@ -314,8 +313,7 @@ struct SerialData< vector< Args... >, is_true< vector< Args... > > > {
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >() +
-                "< " + SerialData< DataType >::alias() + " >";
+        return serial_alias< Type >() + "< " + SerialData< DataType >::alias() + " >";
     }
 
     template< typename HeadType >
@@ -346,7 +344,7 @@ struct SerialData< tuple< Args... >, is_true< tuple< Args... > > > {
     }
 
     static std::string alias() {
-        AliasFunctor functor{ SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >() + "< " };
+        AliasFunctor functor{ serial_alias< Type >() + "< " };
         foreach_sequence( functor, size_t_< 0 >{}, size_t_< tuple_size - 1 >{} );
         return functor.alias + SerialData< DataType< tuple_size - 1 > >::alias() + " >";
     }
@@ -396,8 +394,8 @@ struct SerialData< array< Arg, Dim >, is_true< array< Arg, Dim > > > {
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >() +
-                "< " + SerialData< DataType >::alias() + ", " + std::to_string( Dim ) + " >";
+        return serial_alias< Type >() + "< " +
+                SerialData< DataType >::alias() + ", " + std::to_string( Dim ) + " >";
     }
 
     template< typename HeadType >
@@ -424,8 +422,7 @@ struct SerialData< bitset< Bits >, is_true< bitset< Bits > > > {
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >() +
-                "< " + std::to_string( Bits ) + " >";
+        return serial_alias< Type >() + "< " + std::to_string( Bits ) + " >";
     }
 
     template< typename HeadType >
@@ -450,8 +447,8 @@ struct SerialData< time_point< Clock, Duration >, is_true< time_point< Clock, Du
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >() +
-                "< " + SerialData< ClockType >::alias() + ", " + SerialData< DataType >::alias() + " >";
+        return serial_alias< Type >() + "< " +
+                SerialData< ClockType >::alias() + ", " + SerialData< DataType >::alias() + " >";
     }
 
     template< typename HeadType >
@@ -480,8 +477,8 @@ struct SerialData< duration< Rep, Period >, is_true< duration< Rep, Period > > >
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >() +
-                "< " + SerialData< DataType >::alias() + ", " + SerialData< PeriodType >::alias() + " >";
+        return serial_alias< Type >() + "< " +
+                SerialData< DataType >::alias() + ", " + SerialData< PeriodType >::alias() + " >";
     }
 
     template< typename HeadType >
@@ -508,8 +505,8 @@ struct SerialData< ratio< Num, Den >, is_true< ratio< Num, Den > > > {
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >() +
-                "< " + std::to_string( Num ) + ", " + std::to_string( Den ) + " >";
+        return serial_alias< Type >() + "< " +
+                std::to_string( Num ) + ", " + std::to_string( Den ) + " >";
     }
 
     template< typename HeadType >
@@ -533,8 +530,7 @@ struct SerialData< complex< Arg >, is_true< complex< Arg > > > {
     }
 
     static std::string alias() {
-        return SerialAlias{ SerialMetatype< Type >::alias() }.convert< std::string >() +
-                "< " + SerialData< DataType >::alias() + " >";
+        return serial_alias< Type >() + "< " + SerialData< DataType >::alias() + " >";
     }
 
     template< typename HeadType >
@@ -597,7 +593,7 @@ void SequenceFunctor< Type >::operator()( size_t_< Index > ) {
 template< std::size_t Index >
 void SerialFunctor::operator()( size_t_< Index > ) {
     using DataType = typename SerialIdentity< Index >::ValueType;
-    if ( !generator.recursion( SerialMetatype< DataType >::hash().full() ) ) {
+    if ( !generator.recursion( serial_hash< Type >() ) ) {
         DataType data_ref{};
         auto serial_data = SerialData< DataType >::create( data_ref );
         generator.generate( serial_data );

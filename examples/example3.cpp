@@ -82,7 +82,7 @@ int main() {
     try {
         Head head;
         memserial::parse( head, memserial::SerialView( bytes, memserial::size( head ) ) );
-        std::cout << "Type: " << head.type << "\n";
+        std::cout << "Type: " << memserial::alias( head.type ) << "\n";
 
         Package package = memserial::parse< Package >( memserial::SerialView( bytes, head.size ) );
         std::cout << "Meta: " << package.meta() << "\n";
