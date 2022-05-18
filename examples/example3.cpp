@@ -80,8 +80,7 @@ int main() {
     }
 
     try {
-        Head head;
-        memserial::parse( head, memserial::SerialView( bytes, memserial::size( head ) ) );
+        Head head = memserial::parse< Head >( memserial::SerialView( bytes, memserial::size< Head >() ) );
         std::cout << "Type: " << memserial::alias( head.type ) << "\n";
 
         Package package = memserial::parse< Package >( memserial::SerialView( bytes, head.size ) );

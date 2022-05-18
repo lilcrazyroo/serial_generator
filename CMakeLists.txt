@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 3.2 )
 
 project( MEMSERIAL LANGUAGES CXX )
 set( CMAKE_CXX_STANDARD 14 )
@@ -19,7 +19,7 @@ if( TRUE )
     target_compile_definitions( serial_specs INTERFACE -DSERIAL_REBIND_HEADER="${GENERATED_HEADER}" )
         
     add_custom_command( OUTPUT ${CMAKE_CURRENT_LIST_DIR}/src/${GENERATED_HEADER} 
-        COMMAND ${CMAKE_COMMAND} -S${CMAKE_CURRENT_SOURCE_DIR}/src -B${CMAKE_CURRENT_BINARY_DIR}/serial_generator 
+        COMMAND ${CMAKE_COMMAND} -B${CMAKE_CURRENT_BINARY_DIR}/serial_generator ${CMAKE_CURRENT_SOURCE_DIR}/src
             -DSERIAL_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
             -DSERIAL_FORWARD_HEADER="serial_precompile.cpp"
             -DSERIAL_GENERATED_HEADER=${GENERATED_HEADER}

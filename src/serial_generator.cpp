@@ -593,7 +593,7 @@ void SequenceFunctor< Type >::operator()( size_t_< Index > ) {
 template< std::size_t Index >
 void SerialFunctor::operator()( size_t_< Index > ) {
     using DataType = typename SerialIdentity< Index >::ValueType;
-    if ( !generator.recursion( serial_hash< Type >() ) ) {
+    if ( !generator.recursion( serial_hash< DataType >() ) ) {
         DataType data_ref{};
         auto serial_data = SerialData< DataType >::create( data_ref );
         generator.generate( serial_data );
